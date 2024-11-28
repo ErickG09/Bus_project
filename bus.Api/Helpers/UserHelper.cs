@@ -69,9 +69,27 @@ namespace bus.Api.Helpers
             return await signInManager.PasswordSignInAsync(login.Email, login.Password, false, false);
         }
 
+
         public async Task LogoutAsync()
         {
             await signInManager.SignOutAsync();
         }
+
+
+        public async Task<bool> VerifyPassword(string email, string password)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                Console.WriteLine($"Usuario {email} no encontrado.");
+                return false;
+            }
+
+            var isValid = await userManager.CheckPasswordAsync(user, password);
+            Console.WriteLine(isValid ? "Contraseña válida" : "Contraseña inválida");
+            return isValid;
+        }
+
+
     }
 }

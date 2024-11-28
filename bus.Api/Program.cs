@@ -25,28 +25,32 @@ namespace bus.Api
             builder.Services.AddScoped<IUserHelper, UserHelper>();
             builder.Services.AddTransient<Seeder>();
 
-            builder.Services.AddIdentity<User, IdentityRole>(
-                x =>{
-                    x.User.RequireUniqueEmail = true;
-                    x.Password.RequireDigit = false;
-                    x.Password.RequireNonAlphanumeric = false;
-                    x.Password.RequireLowercase = false;
-                    x.Password.RequireUppercase = false;
-                    x.Password.RequiredUniqueChars = 0;
-                    x.Password.RequiredLength = 6;
+            builder.Services.AddIdentity<User, IdentityRole>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
             }).AddEntityFrameworkStores<DataContext>()
-            .AddDefaultTokenProviders();
+              .AddDefaultTokenProviders();
+
+
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(x => x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes
-                    (builder.Configuration["jwtKey"]!)), ClockSkew = TimeSpan.Zero
-                });
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwtKey"] ?? "DefaultKey")),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
 
             var app = builder.Build();
 
