@@ -195,8 +195,9 @@ namespace bus.Api
             var passenger = await dataContext.Passengers.FirstOrDefaultAsync();
             var origin = await dataContext.Origins.FirstOrDefaultAsync();
             var destination = await dataContext.Destinations.FirstOrDefaultAsync();
+            var user = await dataContext.Users.FirstOrDefaultAsync(); // Obtener un usuario existente
 
-            if (trip == null || passenger == null || origin == null || destination == null) return;
+            if (trip == null || passenger == null || origin == null || destination == null || user == null) return;
 
             if (!dataContext.TripDetails.Any())
             {
@@ -206,7 +207,8 @@ namespace bus.Api
                     PassengerId = passenger.Id,
                     TripId = trip.Id,
                     OriginId = origin.Id,
-                    DestinationId = destination.Id
+                    DestinationId = destination.Id,
+                    UserId = user.Id // Asigna un UserId válido
                 });
 
                 dataContext.TripDetails.Add(new TripDetail
@@ -215,7 +217,8 @@ namespace bus.Api
                     PassengerId = passenger.Id,
                     TripId = trip.Id,
                     OriginId = origin.Id,
-                    DestinationId = destination.Id
+                    DestinationId = destination.Id,
+                    UserId = user.Id // Asigna un UserId válido
                 });
 
                 await dataContext.SaveChangesAsync();

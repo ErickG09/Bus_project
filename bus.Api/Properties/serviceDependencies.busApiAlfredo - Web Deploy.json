@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "mssql2": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/busApiAlfredo/providers/Microsoft.ServiceLinker/linkers/ConnectionStrings_416B5B3644",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/busapidbserver14/databases/bus.Api_db",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings"
+    },
+    "mssql1": {
+      "serviceConnectorResourceId": "",
+      "secretStore": "AzureAppSettings",
+      "type": "mssql.onprem",
+      "connectionId": "ConnectionStrings:con",
+      "dynamicId": null
+    },
+    "apis1": {
+      "apiEndpoint": "https://busapi.azure-api.net/",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/busApi/apis/busApi",
+      "type": "apis.azure"
+    }
+  }
+}
