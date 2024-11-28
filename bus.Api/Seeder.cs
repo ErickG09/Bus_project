@@ -1,5 +1,6 @@
 ﻿using bus.Api.Helpers;
 using bus.Shared.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace bus.Api
@@ -7,12 +8,14 @@ namespace bus.Api
     public class Seeder
     {
         private readonly DataContext dataContext;
+        private readonly UserManager<User> userManager;
         private readonly IUserHelper userHelper;
 
-        public Seeder(DataContext dataContext, 
+        public Seeder(DataContext dataContext, UserManager<User> userManager,
             IUserHelper userHelper)
         {
             this.dataContext = dataContext;
+            this.userManager = userManager;
             this.userHelper = userHelper;
         }
 
@@ -67,7 +70,7 @@ namespace bus.Api
                 };
 
                 // Crear el usuario en la base de datos con una contraseña predeterminada
-                var result = await userHelper.AddUserAsync(user, "contraseña");
+                var result = await userHelper.AddUserAsync(user, "password123");
                 if (!result.Succeeded)
                 {
                     throw new Exception($"Unable to create user {email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
@@ -90,6 +93,7 @@ namespace bus.Api
 
 
         }
+
 
         private async Task CheckCompaniesAsync()
         {
@@ -195,8 +199,9 @@ namespace bus.Api
             var passenger = await dataContext.Passengers.FirstOrDefaultAsync();
             var origin = await dataContext.Origins.FirstOrDefaultAsync();
             var destination = await dataContext.Destinations.FirstOrDefaultAsync();
+            var user = await dataContext.Users.FirstOrDefaultAsync(); // Asegúrate de obtener un usuario
 
-            if (trip == null || passenger == null || origin == null || destination == null) return;
+            if (trip == null || passenger == null || origin == null || destination == null || user == null) return;
 
             if (!dataContext.TripDetails.Any())
             {
@@ -206,7 +211,8 @@ namespace bus.Api
                     PassengerId = passenger.Id,
                     TripId = trip.Id,
                     OriginId = origin.Id,
-                    DestinationId = destination.Id
+                    DestinationId = destination.Id,
+                    UserId = user.Id // Asigna un UserId válido
                 });
 
                 dataContext.TripDetails.Add(new TripDetail
@@ -215,11 +221,15 @@ namespace bus.Api
                     PassengerId = passenger.Id,
                     TripId = trip.Id,
                     OriginId = origin.Id,
-                    DestinationId = destination.Id
+                    DestinationId = destination.Id,
+                    UserId = user.Id // Asigna un UserId válido
                 });
 
                 await dataContext.SaveChangesAsync();
             }
         }
+
+
+
     }
 }

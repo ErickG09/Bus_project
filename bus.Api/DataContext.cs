@@ -77,6 +77,13 @@ namespace bus.Api
                 .WithMany()
                 .HasForeignKey(td => td.DestinationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TripDetail>()
+            .HasOne(td => td.User) // Relación con la entidad User
+            .WithMany(u => u.TripDetails)
+            .HasForeignKey(td => td.UserId)
+            .OnDelete(DeleteBehavior.Restrict); // O Cascade
+
         }
     }
 }
