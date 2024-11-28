@@ -14,11 +14,12 @@ namespace bus.Shared.Entities
         [Required]
         [MaxLength(100, ErrorMessage = "The field {0} must have a maximum of {1} characters")]
         [Display(Name = "Name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [Required]
         [Display(Name = "Seat")]
         public int Seat { get; set; }
+
     }
 
 }

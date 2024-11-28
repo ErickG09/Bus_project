@@ -14,7 +14,8 @@ namespace bus.Shared.Entities
         [Required]
         [MaxLength(100, ErrorMessage = "The field {0} must have a maximum of {1} characters")]
         [Display(Name = "Station")]
-        public string Station { get; set; }
+        public string Station { get; set; } = null!;
+
     }
 
 }

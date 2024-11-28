@@ -14,12 +14,15 @@ namespace bus.Shared.Entities
         [Required]
         [MaxLength(100, ErrorMessage = "The field {0} must have a maximum of {1} characters")]
         [Display(Name = "Name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [Required]
         [MaxLength(50, ErrorMessage = "The field {0} must have a maximum of {1} characters")]
         [Display(Name = "License")]
-        public string License { get; set; }
+        public string License { get; set; } = null!;
+
+        // Relación con Trip
+        public ICollection<Trip> Trips { get; set; } = new List<Trip>();
     }
 
 }

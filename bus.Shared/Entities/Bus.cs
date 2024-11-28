@@ -18,12 +18,12 @@ namespace bus.Shared.Entities
         [Required]
         [MaxLength(50, ErrorMessage = "The field {0} must have a maximum of {1} characters")]
         [Display(Name = "Category")]
-        public string Category { get; set; }
+        public string Category { get; set; } = null!;
 
+        // Relación con Company
         [Required]
-        [MaxLength(100, ErrorMessage = "The field {0} must have a maximum of {1} characters")]
-        [Display(Name = "Company")]
-        public string Company { get; set; }
+        public int CompanyId { get; set; } // Clave foránea hacia Company
+        public Company Company { get; set; } = null!; // Propiedad de navegación
     }
 
 }

@@ -26,19 +26,23 @@ namespace bus.Shared.Entities
         [Display(Name = "Arrival Date")]
         public DateTime? ArrivalDate { get; set; }
 
-        [MaxLength(100, ErrorMessage = "The field {0} must have a maximum of {1} characters")]
-        [Display(Name = "Company")]
-        public string Company { get; set; }
-
         [MaxLength(50, ErrorMessage = "The field {0} must have a maximum of {1} characters")]
         [Display(Name = "Platform")]
-        public string Platform { get; set; }
+        public string Platform { get; set; } = null!;
 
-        [Display(Name = "Passengers")]
-        public List<Passenger> Passengers { get; set; }
-
+        // Relación con Driver (1 a *)
         [Required]
-        public Bus Bus { get; set; }
+        public int DriverId { get; set; }
+        public Driver Driver { get; set; } = null!;
+
+        // Relación con Bus (* a 1)
+        [Required]
+        public int BusId { get; set; }
+        public Bus Bus { get; set; } = null!;
+
+        // Relación con TripDetail (1 a *)
+        public ICollection<TripDetail> TripDetails { get; set; } = new List<TripDetail>();
+
     }
 
 }

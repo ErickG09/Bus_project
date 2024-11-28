@@ -1,4 +1,10 @@
+using bus.Api.Helpers;
+using bus.Shared.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace bus.Api
 {
@@ -16,8 +22,35 @@ namespace bus.Api
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("name=con"));
+            builder.Services.AddScoped<IUserHelper, UserHelper>();
+            builder.Services.AddTransient<Seeder>();
+
+            builder.Services.AddIdentity<User, IdentityRole>(
+                x =>{
+                    x.User.RequireUniqueEmail = true;
+                    x.Password.RequireDigit = false;
+                    x.Password.RequireNonAlphanumeric = false;
+                    x.Password.RequireLowercase = false;
+                    x.Password.RequireUppercase = false;
+                    x.Password.RequiredUniqueChars = 0;
+                    x.Password.RequiredLength = 6;
+            }).AddEntityFrameworkStores<DataContext>()
+            .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(x => x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes
+                    (builder.Configuration["jwtKey"]!)), ClockSkew = TimeSpan.Zero
+                });
 
             var app = builder.Build();
+
+            SeedApp(app);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -27,6 +60,7 @@ namespace bus.Api
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
@@ -34,6 +68,20 @@ namespace bus.Api
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static void SeedApp(WebApplication app)
+        {
+            IServiceScopeFactory? serviceScopeFactory =
+                app.Services.GetService<IServiceScopeFactory>();
+            using (IServiceScope? serviceScope =
+                serviceScopeFactory!.CreateScope())
+            {
+                Seeder? seeder = 
+                    serviceScope.ServiceProvider.GetService<Seeder?>();
+                seeder!.SeedAsync().Wait();
+            }
+            
         }
     }
 }

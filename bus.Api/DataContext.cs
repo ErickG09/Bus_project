@@ -1,9 +1,10 @@
 ﻿using bus.Shared.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace bus.Api
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
@@ -22,14 +23,60 @@ namespace bus.Api
         {
             base.OnModelCreating(modelBuilder);
 
-            // Ejemplo de configuración de índices únicos (ajústalo según tus necesidades)
+            // Configuración de índices únicos
             modelBuilder.Entity<Company>().HasIndex(x => x.CompanyName).IsUnique();
             modelBuilder.Entity<Driver>().HasIndex(x => x.License).IsUnique();
             modelBuilder.Entity<Destination>().HasIndex(x => x.Station).IsUnique();
             modelBuilder.Entity<Origin>().HasIndex(x => x.Station).IsUnique();
-            modelBuilder.Entity<Bus>().HasIndex(x => new { x.Company, x.Category }).IsUnique();
 
-            // Configura las relaciones y restricciones adicionales aquí si es necesario
+            // Relación Company - Bus 
+            modelBuilder.Entity<Bus>()
+                .HasOne(b => b.Company)
+                .WithMany(c => c.Buses)
+                .HasForeignKey(b => b.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación Driver - Trip 
+            modelBuilder.Entity<Trip>()
+                .HasOne(t => t.Driver)
+                .WithMany(d => d.Trips)
+                .HasForeignKey(t => t.DriverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación Bus - Trip 
+            modelBuilder.Entity<Trip>()
+                .HasOne(t => t.Bus)
+                .WithMany()
+                .HasForeignKey(t => t.BusId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación Trip - TripDetail 
+            modelBuilder.Entity<Trip>()
+                .HasMany(t => t.TripDetails)
+                .WithOne(td => td.Trip)
+                .HasForeignKey(td => td.TripId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relación TripDetail - Passenger 
+            modelBuilder.Entity<TripDetail>()
+                .HasOne(td => td.Passenger)
+                .WithMany()
+                .HasForeignKey(td => td.PassengerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación TripDetail - Origin 
+            modelBuilder.Entity<TripDetail>()
+                .HasOne(td => td.Origin)
+                .WithMany()
+                .HasForeignKey(td => td.OriginId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación TripDetail - Destination 
+            modelBuilder.Entity<TripDetail>()
+                .HasOne(td => td.Destination)
+                .WithMany()
+                .HasForeignKey(td => td.DestinationId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
